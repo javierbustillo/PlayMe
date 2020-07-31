@@ -8,7 +8,10 @@ For example:
 
 Search for "Beach" music
 It goes into Spotify and scrapes the top 20 playlists with "Beach" in the title. 
+
 With those 20 playlists it then trains a model to recognize "Beach" music.
+
 Then it goes into your liked songs and filters out any song that is not "Beach"-like.
+
 
 Bam a playlist is created with your curated beach music
