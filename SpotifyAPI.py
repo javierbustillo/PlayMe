@@ -94,11 +94,3 @@ class SpotifyAPI:
 
     def skip(self):
         return self.request_data(f'/me/player/next', token=self.tok, method='POST', body=[])
-
-
-
-
-
-
-
-
