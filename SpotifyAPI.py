@@ -7,7 +7,7 @@ import json
 
 class SpotifyAPI:
     base_url = 'https://api.spotify.com/v1'
-    tok = 'BQDXq0vVcCToCDBwHve_ykmLX7iuAiinR-qrdkHFweuemADR6pO2-BUcO2B_ojkN83MaGixnhrcXwn7a6ciF-JzoF78KjHZP7h9g-Rozt1kXlSQ8rI3htGmj1zkIHEu47rzSGmrD2AUpZZi8vr-Xljevxcpd6oa97aGkEuEUQu8vjUARPovbrE0nOi1F-ASc082ECcfgzv3uYGUeW2tjKsfL0xdP3whLXNUsqgxvMGHOeo0L8yqM10-N_RAGjHCeXEiRpzj8xPHxoDfciFk'
+    tok = 'BQB1hjiuyXm8FGZTNyEIIZQAEdG0yjCsa9bsRzr0SIuZP9FtddDwv_8UFarMLJt5IdypbqGAlRbW5B5JjVxYCeRqzTt0wGOccg2SPNu8IHNCcT2xK5lWnmpXZL8jBWjlkAnRZdjb6_K3w0CTlkYIwcOwgm6VKtLV9FS5YSx9435-paFZOJ5jft1HXaQDnylHZbDZQg_HMJXncU5s-kDRFF88PNnC9eiX6krIw3OWmE4n-bsZWgcAe7aesNnHB2NEf17vpr53esoZnN8Rt_4'
 
     def request_data(self, url, token=tok, method='GET', body=None):
         header = {'Authorization': 'Bearer ' + token} if token else None
@@ -70,7 +70,7 @@ class SpotifyAPI:
     def search(self, query, type):
         query_list = query.split(" ")
         query_string = '%20'.join(query_list)
-        return self.request_data(f'/search?q="{query_string}"&type={type}', token=self.tok)
+        return self.request_data(f'/search?q="{query_string}"&type={type}&limit=50', token=self.tok)
 
     def search_track(self, query):
         return self.search(query, "track")
@@ -84,8 +84,9 @@ class SpotifyAPI:
 
     def add_tracks_to_playlist(self, playlist_id, track_ids):
         body_list = []
-        track_string = f'spotify:track:{track_ids}'
-        body_list.append(track_string)
+        track_string = 'spotify:track:{}'
+        for track_id in track_ids:
+            body_list.append(track_string.format(track_id))
         body = {"uris": body_list}
         return self.request_data(f'/playlists/{playlist_id}/tracks', method='POST', body=body, token=self.tok)
 

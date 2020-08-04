@@ -1,7 +1,10 @@
+import json
+import random
+
+import requests
+
 from SpotifyAPI import SpotifyAPI
 import csv
-
-from train import train
 
 
 def get_urls(track_ids):
@@ -18,7 +21,7 @@ def get_urls(track_ids):
             continue
         current_url += track_id + ','
         count += 1
-        if count % 10 == 0:
+        if count % 100 == 0:
             urls.append(current_url[:-1])
             current_url = url
 
@@ -27,9 +30,12 @@ def get_urls(track_ids):
 
 
 def get_audio_features(urls):
+    print("Getting audio features...")
     features = []
     for url in urls:
         track_features = SpotifyAPI().request_data(url)
+        if track_features is None:
+            continue
         audio_features = track_features['audio_features']
         for audio_feature in audio_features:
             if audio_feature is None:
@@ -47,6 +53,7 @@ def scrape(search_term):
     for playlist in searched_playlists:
         playlists_tracks_id.append(playlist["id"])
 
+    print("Getting tracks from playlists...")
     for playlist_id in playlists_tracks_id:
         playlist_tracks.append(SpotifyAPI().get_playlist_tracks(playlist_id))
 
@@ -59,14 +66,26 @@ def scrape(search_term):
     urls = get_urls(track_ids)
     features = get_audio_features(urls)
 
-    with open('audio_feat.csv', mode='a') as features_file:
+    print("Creating dataset...")
+    with open('audio_feat.csv', mode='a', newline='') as features_file:
         feature_writer = csv.writer(features_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         header = ["danceability", "energy", "term"]
         feature_list = []
         for feature in features:
             feature_list.append([feature['danceability'], feature['energy'], feature['acousticness'],
-                                 feature['instrumentalness'], feature['liveness'], feature['loudness'],
-                                 feature['speechiness'], feature['valence'], feature['tempo'], search_term])
+                                 feature['instrumentalness'], feature['liveness'],
+                                 feature['speechiness'], feature['valence'], feature['tempo'],  search_term])
         feature_writer.writerows(feature_list)
 
+
+def generate_rand_data():
+    with open('audio_feat.csv', mode='a') as features_file:
+        feature_writer = csv.writer(features_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        header = ["danceability", "energy", "term"]
+        feature_list = []
+        for feature in range(1000):
+            feature_list.append([random.random(), random.random(), random.random(),
+                                 random.random(), random.random(), random.random(),
+                                 random.random(), random.random(), random.uniform(60, 120), "random"])
+        feature_writer.writerows(feature_list)
 
